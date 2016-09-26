@@ -1,0 +1,47 @@
+Sub foo2()
+Dim x As Workbook
+Dim y As Workbook
+Dim fdFileDialog As FileDialog
+Dim SelectedItemsCount As Long
+Dim i As Long
+Dim Filas As Integer
+'Set PasteStart = [Sheet1!A1]
+
+Set fdFileDialog = Application.FileDialog(msoFileDialogOpen)
+With fdFileDialog
+    .Filters.Clear
+    .Filters.Add "Alle-Dateien (*.*),*.*", "*.*"
+    .FilterIndex = 1
+    .InitialView = msoFileDialogViewDetails
+    .Title = "please choose files"
+    .ButtonName = "open"
+    .AllowMultiSelect = True
+    .Show
+    If .SelectedItems.Count = 0 Then
+        MsgBox "No files selected"
+        Exit Sub
+    End If
+    SelectedItemsCount = .SelectedItems.Count
+    
+    
+    For i = 1 To SelectedItemsCount
+       ''' MsgBox "You selected: " & .SelectedItems(i)
+        '## Open both workbooks first:
+        
+        
+        Set x = ActiveWorkbook
+          Filas = x.Worksheets("Sheet1").Cells.CurrentRegion.Rows.Count
+          MsgBox Filas
+        Set y = Workbooks.Open(.SelectedItems(i))
+    
+
+    'Now, transfer values from y to x:
+    With y.Sheets("Requerimientos").UsedRange.Copy
+    x.Sheets("Sheet1").Range("A" & Filas).PasteSpecial ' = .Value
+    End With
+    'Close y:
+    y.Close
+
+ Next i
+End With
+End Sub
