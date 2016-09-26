@@ -1,47 +1,37 @@
-Sub foo2()
+Sub PegaDesdeArchivos()
 Dim x As Workbook
 Dim y As Workbook
-Dim fdFileDialog As FileDialog
-Dim SelectedItemsCount As Long
+Dim Dialogo As FileDialog
+Dim CuentaItems As Long
 Dim i As Long
 Dim Filas As Integer
-'Set PasteStart = [Sheet1!A1]
 
-Set fdFileDialog = Application.FileDialog(msoFileDialogOpen)
-With fdFileDialog
+Set Dialogo = Application.FileDialog(msoFileDialogOpen)
+With Dialogo
     .Filters.Clear
-    .Filters.Add "Alle-Dateien (*.*),*.*", "*.*"
+    .Filters.Add "Todos (*.*),*.*", "*.*"
     .FilterIndex = 1
     .InitialView = msoFileDialogViewDetails
-    .Title = "please choose files"
-    .ButtonName = "open"
-    .AllowMultiSelect = True
+    .Title = "Escoge al menos un archivo, el contenido de la hoja 'Requerimientos' será copiado y pegado posteriormente"
+    .ButtonName = "Abrir"
+    .AllowMultiSelect = True 'permite copiar mas de un registro
     .Show
-    If .SelectedItems.Count = 0 Then
-        MsgBox "No files selected"
-        Exit Sub
-    End If
-    SelectedItemsCount = .SelectedItems.Count
-    
-    
-    For i = 1 To SelectedItemsCount
-       ''' MsgBox "You selected: " & .SelectedItems(i)
-        '## Open both workbooks first:
-        
-        
+        If .SelectedItems.Count = 0 Then
+         MsgBox "Sin selección, Fin del programa"
+         Exit Sub
+        End If
+    CuentaItems = .SelectedItems.Count 'Cuenta los archivos seleccionados
+        For i = 1 To CuentaItems
         Set x = ActiveWorkbook
-          Filas = x.Worksheets("Sheet1").Cells.CurrentRegion.Rows.Count
-          MsgBox Filas
+        Filas = x.Worksheets("Sheet1").Cells.CurrentRegion.Rows.Count 'Funciona con la hoja1
+            'MsgBox Filas
         Set y = Workbooks.Open(.SelectedItems(i))
-    
+            'Copia el contenido de y hacia el archivo x a partir del ultimo registro
+            With y.Sheets("Requerimientos").UsedRange.Copy
+                    x.Sheets("Sheet1").Range("A" & Filas + 1).PasteSpecial
+            End With
+        y.Close
 
-    'Now, transfer values from y to x:
-    With y.Sheets("Requerimientos").UsedRange.Copy
-    x.Sheets("Sheet1").Range("A" & Filas).PasteSpecial ' = .Value
-    End With
-    'Close y:
-    y.Close
-
- Next i
+        Next i
 End With
 End Sub
