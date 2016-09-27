@@ -5,7 +5,7 @@ Dim Dialogo As FileDialog
 Dim CuentaItems As Long
 Dim i As Long
 Dim Filas As Integer
-
+Application.ScreenUpdating = False
 Set Dialogo = Application.FileDialog(msoFileDialogOpen)
 With Dialogo
     .Filters.Clear
@@ -25,13 +25,15 @@ With Dialogo
         Set x = ActiveWorkbook
         Filas = x.Worksheets("Sheet1").Cells.CurrentRegion.Rows.Count 'Funciona con la hoja1
             'MsgBox Filas
-        Set y = Workbooks.Open(.SelectedItems(i))
+        Set y = Workbooks.Open(.SelectedItems(i), UpdateLinks:=False, ReadOnly:=False)
             'Copia el contenido de y hacia el archivo x a partir del ultimo registro
-            With y.Sheets("Requerimientos").UsedRange.Copy
+            With y.Sheets("Requerimientos").UsedRange.Copy ''Sheets("Requerimientos").Range("A1").CurrentRegion.Copy
                     x.Sheets("Sheet1").Range("A" & Filas + 1).PasteSpecial
+                    Application.CutCopyMode = False
             End With
         y.Close
 
         Next i
 End With
+Application.ScreenUpdating = True
 End Sub
