@@ -5,6 +5,7 @@ Dim Dialogo As FileDialog
 Dim CuentaItems As Long
 Dim i As Long
 Dim Filas As Integer
+
 Application.ScreenUpdating = False
 Set Dialogo = Application.FileDialog(msoFileDialogOpen)
 With Dialogo
@@ -20,18 +21,22 @@ With Dialogo
          MsgBox "Sin selección, Fin del programa"
          Exit Sub
         End If
+        
     CuentaItems = .SelectedItems.Count 'Cuenta los archivos seleccionados
         For i = 1 To CuentaItems
-        Set x = ActiveWorkbook
-        Filas = x.Worksheets("Sheet1").Cells.CurrentRegion.Rows.Count 'Funciona con la hoja1
-            'MsgBox Filas
-        Set y = Workbooks.Open(.SelectedItems(i), UpdateLinks:=False, ReadOnly:=False)
+     '  MsgBox .SelectedItems(i) ' para monitoreo
+     Set x = ActiveWorkbook ''Activa archivo en el cual se copia
+        Filas = x.Worksheets("Sheet1").Cells.CurrentRegion.Rows.Count 'Funciona con la hoja1 checar diferencias entre currentregion y usedrange
+      '      MsgBox Filas ' para monitoreo
+            Set y = Workbooks.Open(.SelectedItems(i), UpdateLinks:=False, ReadOnly:=False) '' activa archivo con datos de origen
             'Copia el contenido de y hacia el archivo x a partir del ultimo registro
-            With y.Sheets("Requerimientos").UsedRange.Copy ''Sheets("Requerimientos").Range("A1").CurrentRegion.Copy
-                    x.Sheets("Sheet1").Range("A" & Filas + 1).PasteSpecial
+            'se usa a partir de a6 pues es donde están los datos, si no, solo copia el titulo si los datos tiene espacios
+            With y.Sheets("Requerimientos").Range("A6").CurrentRegion.Copy ''y.Sheets("Requerimientos").UsedRange.Copy ''Sheets("Requerimientos").Range("A1").CurrentRegion.Copy
+                    x.Sheets("Sheet1").Range("A" & Filas + 1).PasteSpecial (xlPasteValuesAndNumberFormats)
+                    x.Sheets("Sheet1").Range("A" & Filas + 1).Value = Dialogo.SelectedItems(i)
                     Application.CutCopyMode = False
             End With
-        y.Close
+        y.Close SaveChanges:=False
 
         Next i
 End With
