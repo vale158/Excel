@@ -1,0 +1,16 @@
+Sub Junta_Info()
+
+Dim x As Workbook
+Dim cuenta As Integer
+Dim Filas As Integer
+
+  Set x = ActiveWorkbook
+cuenta = x.Sheets.Count
+For i = 1 To cuenta
+Filas = x.Worksheets(i).Cells.CurrentRegion.Rows.Count
+
+MsgBox Filas
+Next i
+
+
+End Sub
